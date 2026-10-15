@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Tracker</title>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d2433; --muted:#6b7385; --line:#e3e1da;
+  --accent:#2f7d5b; --accent-weak:#dcefe5; --warn:#b4531a; --warn-weak:#fbe9dc; --empty:#ebe9e2;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#14171c; --card:#1d2128; --ink:#e8eaee; --muted:#8c94a5; --line:#2c323c;
+    --accent:#4fb383; --accent-weak:#1f3a2e; --warn:#e58a4d; --warn-weak:#3a2a1e; --empty:#2a2f38;}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:20px 20px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:20px;margin:0;letter-spacing:-.01em}
+nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+nav button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer}
+nav button.on{background:var(--accent);color:#fff}
+button{font:inherit}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.row{display:flex;align-items:center;gap:10px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--warn)}
+.muted{color:var(--muted)}
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.datebar h2{margin:0;font-size:18px}
+.progress{height:10px;border-radius:99px;background:var(--empty);overflow:hidden;margin:6px 0 16px}
+.progress>i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;color:var(--ink)}
+.item:hover{border-color:var(--accent)}
+.box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;flex:none;font-size:15px;color:#fff;line-height:1}
+.item.done{background:var(--accent-weak);border-color:var(--accent)}
+.item.done .box{background:var(--accent);border-color:var(--accent)}
+.item .name{font-weight:600;flex:1}
+.item.done .name{text-decoration:line-through;text-decoration-color:var(--muted)}
+.key{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.streak{font-size:12px;color:var(--muted)}
+textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card);color:var(--ink);font:inherit;resize:vertical}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.tile .v{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.tile .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:14px}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.bar{height:8px;border-radius:99px;background:var(--empty);min-width:90px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.scroll{overflow-x:auto}
+.heat{display:grid;gap:3px;align-items:center}
+.heat .lab{font-size:12px;color:var(--muted);padding-right:8px;white-space:nowrap;position:sticky;left:0;background:var(--card)}
+.heat .c{width:16px;height:16px;border-radius:4px;background:var(--empty)}
+.heat .c.d{background:var(--accent)}
+.heat .h{font-size:10px;color:var(--muted);text-align:center}
+.bars{display:flex;align-items:flex-end;gap:3px;height:110px}
+.bars i{flex:1;min-width:4px;background:var(--accent);border-radius:3px 3px 0 0;opacity:.9}
+.bars i.z{background:var(--empty);height:3px!important}
+h3{margin:0 0 10px;font-size:15px}
+.seg{display:inline-flex;gap:4px}
+.seg button{border:1px solid var(--line);background:var(--card);color:var(--muted);padding:5px 11px;border-radius:7px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.stack>*+*{margin-top:14px}
+input[type=text],input[type=date]{font:inherit;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--card);color:var(--ink)}
+.banner{background:var(--warn-weak);color:var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-weight:600;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:.92}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Daily Tracker</h1>
+    <nav id="nav">
+      <button data-v="today">Today</button>
+      <button data-v="review">Review</button>
+      <button data-v="settings">Settings</button>
+    </nav>
+  </header>
+  <div id="main"></div>
+</div>
+<div id="toast"></div>
+<script>
+const KEY = 'daily-tracker-v1';
+const DEFAULTS = ['Exercise','LeetCode','GitHub','Project','HackerRank','HackerEarth','CodeChef','Codeforces','Course'];
+
+function fresh(){
+  return {activities: DEFAULTS.map((n,i)=>({id:'a'+(i+1), name:n})), days:{}, nextId:DEFAULTS.length+1, lastExport:null};
+}
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if(s && Array.isArray(s.activities) && s.days) return s;
+  }catch(e){}
+  return fresh();
+}
+let state = load();
+let view = 'today', cur = fmt(new Date()), range = 30;
+
+function save(quiet){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); if(!quiet) toast('Saved'); }
+  catch(e){ toast('Could not save. Export a backup now.'); }
+}
+let tt;
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1400); }
+
+/* ---------- date helpers (local time, never UTC) ---------- */
+function fmt(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function addDays(s,n){ const d=parse(s); d.setDate(d.getDate()+n); return fmt(d); }
+const todayStr = () => fmt(new Date());
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- data helpers ---------- */
+const acts = () => state.activities;
+function isDone(date,id){ const d=state.days[date]; return !!(d && d.done && d.done.includes(id)); }
+function doneCount(date){ return acts().filter(a=>isDone(date,a.id)).length; }
+function toggle(date,id){
+  const d = state.days[date] || (state.days[date]={done:[],note:''});
+  const i = d.done.indexOf(id);
+  if(i>=0) d.done.splice(i,1); else d.done.push(id);
+  if(!d.done.length && !d.note) delete state.days[date];
+  save(true); render();
+}
+function setNote(v){
+  const d = state.days[cur] || (state.days[cur]={done:[],note:''});
+  d.note = v;
+  if(!d.done.length && !d.note) delete state.days[cur];
+  save(true);
+}
+function currentStreak(id){
+  let d = todayStr();
+  if(!isDone(d,id)) d = addDays(d,-1);
+  let n=0; while(isDone(d,id)){ n++; d=addDays(d,-1); }
+  return n;
+}
+function earliest(){
+  const ks = Object.keys(state.days).sort();
+  return ks.length ? ks[0] : todayStr();
+}
+function bestStreak(id){
+  let best=0, run=0, d=earliest(); const end=todayStr();
+  while(d<=end){ if(isDone(d,id)){ run++; best=Math.max(best,run); } else run=0; d=addDays(d,1); }
+  return best;
+}
+function dayList(n){
+  const end=todayStr(); let start;
+  if(n==='all'){ start=earliest(); const min=addDays(end,-6); if(start>min) start=min; }
+  else start=addDays(end,-(n-1));
+  const out=[]; for(let d=start; d<=end; d=addDays(d,1)) out.push(d);
+  return out;
+}
+
+/* ---------- views ---------- */
+function render(){
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
+  const m=document.getElementById('main');
+  m.innerHTML = view==='today' ? vToday() : view==='review' ? vReview() : vSettings();
+}
+document.getElementById('nav').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; view=b.dataset.v; render();
+});
+
+function backupBanner(){
+  const has = Object.keys(state.days).length>0;
+  if(!has) return '';
+  const last = state.lastExport ? parse(state.lastExport) : null;
+  const age = last ? Math.floor((Date.now()-last.getTime())/86400000) : 999;
+  if(age<7) return '';
+  return `<div class="banner"><span>${last?`Last backup was ${age} days ago.`:'You have not backed up your data yet.'}</span><button class="btn" onclick="exportJSON()">Download backup</button></div>`;
+}
+
+function vToday(){
+  const list=acts(), n=list.length, k=doneCount(cur);
+  const day=state.days[cur]||{done:[],note:''};
+  const pct = n? Math.round(k/n*100):0;
+  const label = parse(cur).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const items = list.map((a,i)=>{
+    const dn=isDone(cur,a.id), s=currentStreak(a.id);
+    return `<button class="item ${dn?'done':''}" onclick="toggle('${cur}','${a.id}')">
+      <span class="box">${dn?'✓':''}</span>
+      <span class="name">${esc(a.name)}</span>
+      ${s>1?`<span class="streak">🔥 ${s} days</span>`:''}
+      ${i<9?`<span class="key">${i+1}</span>`:''}
+    </button>`;
+  }).join('');
+  return `${backupBanner()}
+  <div class="datebar">
+    <h2>${label}${cur===todayStr()?' <span class="muted">· today</span>':''}</h2>
+    <div class="row">
+      <button class="btn" onclick="go(-1)">←</button>
+      <input type="date" value="${cur}" onchange="pick(this.value)">
+      <button class="btn" onclick="go(1)">→</button>
+      <button class="btn" onclick="pick(todayStr())">Today</button>
+    </div>
+  </div>
+  <div class="row"><strong>${k} / ${n} done</strong><span class="muted">${pct}%</span></div>
+  <div class="progress"><i style="width:${pct}%"></i></div>
+  ${items || '<p class="muted">No activities yet. Add some in Settings.</p>'}
+  <h3 style="margin-top:18px">Notes for this day</h3>
+  <textarea placeholder="What did you solve, ship or learn?" oninput="setNote(this.value)">${esc(day.note||'')}</textarea>
+  <p class="muted" style="font-size:12px">Shortcuts: 1–9 toggle an item · ← → change day · T jumps to today</p>`;
+}
+function go(n){ cur=addDays(cur,n); render(); }
+function pick(v){ if(v){ cur=v; render(); } }
+
+function vReview(){
+  const days=dayList(range), list=acts(), n=list.length;
+  const per = days.map(d=>doneCount(d));
+  const totalDone = per.reduce((a,b)=>a+b,0);
+  const avg = n&&days.length ? Math.round(totalDone/(n*days.length)*100) : 0;
+  const perfect = n? per.filter(x=>x===n).length : 0;
+  const active = per.filter(x=>x>0).length;
+  // active-day streak
+  let st=0, d=todayStr(); if(doneCount(d)===0) d=addDays(d,-1);
+  while(doneCount(d)>0){ st++; d=addDays(d,-1); }
+
+  const rows = list.map(a=>{
+    const c=days.filter(x=>isDone(x,a.id)).length;
+    const p=days.length?Math.round(c/days.length*100):0;
+    return `<tr><td><strong>${esc(a.name)}</strong></td><td>${c} / ${days.length}</td>
+      <td style="width:28%"><div class="bar"><i style="width:${p}%"></i></div></td><td>${p}%</td>
+      <td>${currentStreak(a.id)}</td><td>${bestStreak(a.id)}</td></tr>`;
+  }).join('');
+
+  const cols = days.length;
+  const step = cols<=31?1:cols<=100?5:10;
+  const head = `<div></div>` + days.map((x,i)=>`<div class="h">${i%step===0?parse(x).getDate():''}</div>`).join('');
+  const heat = head + list.map(a=>
+    `<div class="lab">${esc(a.name)}</div>` + days.map(x=>`<div class="c ${isDone(x,a.id)?'d':''}" title="${esc(a.name)} · ${x}"></div>`).join('')
+  ).join('');
+
+  const bars = days.map((x,i)=>{
+    const p=n?per[i]/n*100:0;
+    return `<i class="${per[i]?'':'z'}" style="height:${Math.max(p,3)}%" title="${x}: ${per[i]}/${n}"></i>`;
+  }).join('');
+
+  const notes = days.slice().reverse().filter(x=>state.days[x]&&state.days[x].note).slice(0,8).map(x=>
+    `<tr><td style="white-space:nowrap" class="muted">${parse(x).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</td><td>${esc(state.days[x].note)}</td></tr>`).join('');
+
+  const seg=[7,30,90,'all'].map(r=>`<button class="${range===r?'on':''}" onclick="range=${typeof r==='string'?`'${r}'`:r};render()">${r==='all'?'All':r+'d'}</button>`).join('');
+
+  return `<div class="stack">
+  ${backupBanner()}
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0;font-size:18px">Review</h2><div class="seg">${seg}</div></div>
+  <div class="tiles">
+    <div class="card tile"><div class="l">Avg completion</div><div class="v">${avg}%</div></div>
+    <div class="card tile"><div class="l">Perfect days</div><div class="v">${perfect}</div></div>
+    <div class="card tile"><div class="l">Active days</div><div class="v">${active}<span class="muted" style="font-size:15px"> / ${days.length}</span></div></div>
+    <div class="card tile"><div class="l">Current streak</div><div class="v">${st}<span class="muted" style="font-size:15px"> days</span></div></div>
+  </div>
+  <div class="card"><h3>Daily completion</h3><div class="bars">${bars}</div></div>
+  <div class="card scroll"><h3>Activity heatmap</h3>
+    <div class="heat" style="grid-template-columns:auto repeat(${cols},16px)">${heat}</div></div>
+  <div class="card scroll"><h3>By activity</h3>
+    <table><tr><th>Activity</th><th>Done</th><th></th><th>Rate</th><th>Streak</th><th>Best</th></tr>${rows}</table></div>
+  ${notes?`<div class="card"><h3>Recent notes</h3><table>${notes}</table></div>`:''}
+  </div>`;
+}
+
+function vSettings(){
+  const list=acts().map((a,i)=>`<div class="row" style="margin-bottom:8px">
+    <input type="text" value="${esc(a.name)}" style="flex:1" onchange="rename('${a.id}',this.value)">
+    <button class="btn" onclick="move(${i},-1)" ${i===0?'disabled':''}>↑</button>
+    <button class="btn" onclick="move(${i},1)" ${i===acts().length-1?'disabled':''}>↓</button>
+    <button class="btn danger" onclick="removeAct('${a.id}')">Remove</button></div>`).join('');
+  const total=Object.keys(state.days).length;
+  return `<div class="stack">
+  <div class="card"><h3>Activities</h3>${list}
+    <div class="row" style="margin-top:12px"><input type="text" id="newAct" placeholder="New activity, e.g. Read paper" style="flex:1" onkeydown="if(event.key==='Enter')addAct()">
+    <button class="btn primary" onclick="addAct()">Add</button></div></div>
+  <div class="card"><h3>Your data</h3>
+    <p class="muted" style="margin-top:0">Everything is stored on this Mac, inside this browser or app. ${total} day(s) recorded. ${state.lastExport?'Last backup: '+state.lastExport+'.':'No backup yet.'}</p>
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn primary" onclick="exportJSON()">Download backup (JSON)</button>
+      <button class="btn" onclick="exportCSV()">Export CSV</button>
+      <label class="btn">Restore from backup<input type="file" accept="application/json" hidden onchange="importJSON(this.files[0])"></label>
+      <button class="btn danger" onclick="resetAll()">Erase everything</button>
+    </div></div></div>`;
+}
+function rename(id,v){ const a=acts().find(x=>x.id===id); v=v.trim(); if(a&&v){ a.name=v; save(); } render(); }
+function move(i,dir){ const l=acts(), j=i+dir; if(j<0||j>=l.length) return; [l[i],l[j]]=[l[j],l[i]]; save(true); render(); }
+function addAct(){
+  const el=document.getElementById('newAct'); const v=el.value.trim(); if(!v) return;
+  state.activities.push({id:'a'+(state.nextId++), name:v}); save(); render();
+}
+function removeAct(id){
+  const a=acts().find(x=>x.id===id);
+  if(!confirm(`Remove "${a.name}"? Its history stays in your backup file but disappears from the app.`)) return;
+  state.activities=state.activities.filter(x=>x.id!==id); save(); render();
+}
+
+/* ---------- backup ---------- */
+function download(name,text,type){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportJSON(){
+  state.lastExport=todayStr(); save(true);
+  download(`daily-tracker-backup-${todayStr()}.json`, JSON.stringify(state,null,2), 'application/json');
+  toast('Backup downloaded'); render();
+}
+function exportCSV(){
+  const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+  const head=['Date',...acts().map(a=>q(a.name)),'Done','Note'].join(',');
+  const rows=Object.keys(state.days).sort().map(d=>[d,...acts().map(a=>isDone(d,a.id)?1:0),doneCount(d),q(state.days[d].note||'')].join(','));
+  download(`daily-tracker-${todayStr()}.csv`, [head,...rows].join('\n'), 'text/csv');
+}
+function importJSON(file){
+  if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const s=JSON.parse(r.result);
+      if(!Array.isArray(s.activities)||typeof s.days!=='object') throw 0;
+      if(!confirm('Replace the data in this app with the backup?')) return;
+      state=s; if(!state.nextId) state.nextId=state.activities.length+100; save(); render();
+    }catch(e){ alert('That file is not a valid tracker backup.'); }
+  };
+  r.readAsText(file);
+}
+function resetAll(){
+  if(!confirm('Erase all activities, history and notes from this app? Download a backup first if unsure.')) return;
+  state=fresh(); save(); render();
+}
+
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown',e=>{
+  if(view!=='today') return;
+  const t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA') return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(/^[1-9]$/.test(e.key)){ const a=acts()[+e.key-1]; if(a) toggle(cur,a.id); }
+  else if(e.key==='ArrowLeft') go(-1);
+  else if(e.key==='ArrowRight') go(1);
+  else if(e.key==='t'||e.key==='T') pick(todayStr());
+});
+render();
+</script>
+</body>
+</html>
