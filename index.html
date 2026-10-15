@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Daily Tracker</title>
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1d2433; --muted:#6b7385; --line:#e3e1da;
+  --accent:#2f7d5b; --accent-weak:#dcefe5; --warn:#b4531a; --warn-weak:#fbe9dc; --empty:#ebe9e2;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#14171c; --card:#1d2128; --ink:#e8eaee; --muted:#8c94a5; --line:#2c323c;
+    --accent:#4fb383; --accent-weak:#1f3a2e; --warn:#e58a4d; --warn-weak:#3a2a1e; --empty:#2a2f38;}
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding:20px 20px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+h1{font-size:20px;margin:0;letter-spacing:-.01em}
+nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:3px}
+nav button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;padding:7px 14px;border-radius:7px;cursor:pointer}
+nav button.on{background:var(--accent);color:#fff}
+button{font:inherit}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+.row{display:flex;align-items:center;gap:10px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;cursor:pointer;font-weight:600}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.danger{color:var(--warn)}
+.muted{color:var(--muted)}
+.datebar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.datebar h2{margin:0;font-size:18px}
+.progress{height:10px;border-radius:99px;background:var(--empty);overflow:hidden;margin:6px 0 16px}
+.progress>i{display:block;height:100%;background:var(--accent);transition:width .2s}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;color:var(--ink)}
+.item:hover{border-color:var(--accent)}
+.box{width:24px;height:24px;border-radius:7px;border:2px solid var(--line);display:grid;place-items:center;flex:none;font-size:15px;color:#fff;line-height:1}
+.item.done{background:var(--accent-weak);border-color:var(--accent)}
+.item.done .box{background:var(--accent);border-color:var(--accent)}
+.item .name{font-weight:600;flex:1}
+.item.done .name{text-decoration:line-through;text-decoration-color:var(--muted)}
+.key{font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+.streak{font-size:12px;color:var(--muted)}
+textarea{width:100%;min-height:80px;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--card);color:var(--ink);font:inherit;resize:vertical}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.tile .v{font-size:28px;font-weight:700;letter-spacing:-.02em}
+.tile .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:14px}
+th{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.bar{height:8px;border-radius:99px;background:var(--empty);min-width:90px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--accent)}
+.scroll{overflow-x:auto}
+.heat{display:grid;gap:3px;align-items:center}
+.heat .lab{font-size:12px;color:var(--muted);padding-right:8px;white-space:nowrap;position:sticky;left:0;background:var(--card)}
+.heat .c{width:16px;height:16px;border-radius:4px;background:var(--empty)}
+.heat .c.d{background:var(--accent)}
+.heat .h{font-size:10px;color:var(--muted);text-align:center}
+.bars{display:flex;align-items:flex-end;gap:3px;height:110px}
+.bars i{flex:1;min-width:4px;background:var(--accent);border-radius:3px 3px 0 0;opacity:.9}
+.bars i.z{background:var(--empty);height:3px!important}
+h3{margin:0 0 10px;font-size:15px}
+.seg{display:inline-flex;gap:4px}
+.seg button{border:1px solid var(--line);background:var(--card);color:var(--muted);padding:5px 11px;border-radius:7px;cursor:pointer;font-weight:600}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.stack>*+*{margin-top:14px}
+input[type=text],input[type=date]{font:inherit;border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:var(--card);color:var(--ink)}
+.banner{background:var(--warn-weak);color:var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-weight:600;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:.92}
+<<<<<<< HEAD
+
+:root{--amber:#a16207;--amber-weak:#fdf0cf;--red:#b42318}
+@media (prefers-color-scheme:dark){:root{--amber:#e7b24c;--amber-weak:#3a3020;--red:#f0786a}}
+nav{flex-wrap:wrap}
+select{font:inherit;border:1px solid var(--line);border-radius:8px;padding:6px 8px;background:var(--card);color:var(--ink)}
+.srow{display:grid;grid-template-columns:128px minmax(180px,1.5fr) 138px minmax(150px,1fr) 28px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line)}
+.srow input[type=text],.srow input[type=date]{width:100%;padding:5px 8px;font-size:13px}
+.sname{font-weight:600}
+.sdone .sname{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--muted)}
+.pri{font-size:11px;font-weight:700;padding:1px 7px;border-radius:99px;background:var(--empty);color:var(--muted);margin-left:6px;white-space:nowrap}
+.pri.m{background:var(--accent-weak);color:var(--accent)}
+select.st0{color:var(--muted)}
+select.st1{background:var(--amber-weak);color:var(--amber);border-color:var(--amber)}
+select.st2{background:var(--accent-weak);color:var(--accent);border-color:var(--accent)}
+.x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:14px;border-radius:6px}
+.x:hover{color:var(--red)}
+.cat{margin:16px 0 2px;display:flex;justify-content:space-between;align-items:baseline}
+.cat:first-child{margin-top:0}
+.cat h4{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+@media (max-width:760px){.srow{grid-template-columns:1fr 1fr}.srow .sname{grid-column:1/-1;order:-1}.srow .x{justify-self:end}}
+.tl{position:relative;padding-left:44px}
+.tl::before{content:'';position:absolute;left:14px;top:22px;bottom:22px;width:2px;background:var(--line)}
+.stage{position:relative;margin-bottom:12px}
+.dot{position:absolute;left:-44px;top:16px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;border:2px solid var(--line);background:var(--card);color:var(--muted)}
+.stage.done .dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.stage.cur .dot{border-color:var(--accent);color:var(--accent)}
+.stage.cur>.card{border-color:var(--accent)}
+.stage.started .dot{border-color:var(--amber);color:var(--amber)}
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--empty);color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.tag.done{background:var(--accent-weak);color:var(--accent)}
+.tag.cur{background:var(--accent);color:#fff}
+.tag.started{background:var(--amber-weak);color:var(--amber)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{border:1px solid var(--line);background:var(--empty);color:var(--ink);border-radius:99px;padding:4px 11px;font-size:13px;cursor:pointer;text-align:left}
+.chip.m{border-width:2px;font-weight:600}
+.chip.ip{background:var(--amber-weak);border-color:var(--amber);color:var(--amber)}
+.chip.c{background:var(--accent-weak);border-color:var(--accent);color:var(--accent);text-decoration:line-through}
+.next{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.next:last-child{border-bottom:0}
+.next .grow{flex:1}
+.over{color:var(--red);font-weight:600}
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Daily Tracker</h1>
+    <nav id="nav">
+      <button data-v="today">Today</button>
+      <button data-v="review">Review</button>
+<<<<<<< HEAD
+      <button data-v="skills">Skills</button>
+      <button data-v="roadmap">Roadmap</button>
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+      <button data-v="settings">Settings</button>
+    </nav>
+  </header>
+  <div id="main"></div>
+</div>
+<div id="toast"></div>
+<script>
+<<<<<<< HEAD
+const SEED = {"ai": {"name": "AI Engineer", "items": [["Foundations", "Python (advanced: OOP, async, decorators, typing)", "M"], ["Foundations", "Git & GitHub workflows", "M"], ["Foundations", "Linux & command line", "M"], ["Foundations", "REST APIs & JSON handling", "M"], ["Foundations", "SQL basics", "M"], ["ML & DL Basics", "ML fundamentals (supervised/unsupervised, bias-variance, metrics)", "M"], ["ML & DL Basics", "Deep learning basics with PyTorch", "M"], ["ML & DL Basics", "Transformers & attention mechanism", "M"], ["ML & DL Basics", "NLP basics (tokenization, embeddings)", "M"], ["LLM Applications", "Prompt engineering (few-shot, CoT, system prompts)", "M"], ["LLM Applications", "LLM APIs (OpenAI, Anthropic, Gemini)", "M"], ["LLM Applications", "Structured outputs, function calling & tool use", "M"], ["LLM Applications", "RAG pipelines (end to end)", "M"], ["LLM Applications", "Embeddings & chunking strategies", "M"], ["LLM Applications", "Vector databases (FAISS, Chroma, Pinecone, pgvector)", "M"], ["LLM Applications", "Hybrid search & reranking", "G"], ["LLM Applications", "LangChain / LlamaIndex", "M"], ["LLM Applications", "Agents & multi-agent frameworks (LangGraph, CrewAI)", "M"], ["LLM Applications", "Model Context Protocol (MCP)", "G"], ["LLM Applications", "Memory & context management", "G"], ["Model Adaptation", "Hugging Face ecosystem (Transformers, Datasets, PEFT)", "M"], ["Model Adaptation", "Fine-tuning (LoRA / QLoRA)", "G"], ["Model Adaptation", "Running open-source LLMs (Llama, Mistral, Qwen) via Ollama / vLLM", "G"], ["Model Adaptation", "Quantization & inference optimization", "G"], ["Model Adaptation", "Multimodal models (vision, speech)", "G"], ["Evaluation & Safety", "LLM evaluation (RAGAS, LLM-as-judge, test sets)", "M"], ["Evaluation & Safety", "Guardrails & prompt-injection defense", "M"], ["Evaluation & Safety", "Observability & tracing (LangSmith, Langfuse)", "G"], ["Evaluation & Safety", "Hallucination mitigation techniques", "M"], ["Deployment", "FastAPI / Flask for serving AI apps", "M"], ["Deployment", "Streaming responses (SSE / WebSockets)", "G"], ["Deployment", "Docker & containerization", "M"], ["Deployment", "Cloud basics (AWS / GCP / Azure)", "M"], ["Deployment", "CI/CD basics", "G"], ["Deployment", "Cost & latency optimization", "G"], ["Deployment", "Quick UIs (Streamlit / Gradio) or React basics", "G"], ["Practice", "System design for AI applications", "G"], ["Practice", "Reading & implementing research papers", "G"], ["Practice", "2-3 deployed end-to-end AI projects in portfolio", "M"]]}, "ml": {"name": "ML Engineer", "items": [["Math", "Linear algebra (vectors, matrices, eigen, SVD)", "M"], ["Math", "Probability & statistics (distributions, hypothesis testing, Bayes)", "M"], ["Math", "Calculus & optimization (gradients, gradient descent)", "M"], ["Programming", "Python for data (NumPy, Pandas)", "M"], ["Programming", "Data visualization (Matplotlib, Seaborn, Plotly)", "M"], ["Programming", "SQL for data extraction & analysis", "M"], ["Programming", "Git & GitHub", "M"], ["Classical ML", "Linear & logistic regression", "M"], ["Classical ML", "Decision trees, Random Forest", "M"], ["Classical ML", "Gradient boosting (XGBoost, LightGBM, CatBoost)", "M"], ["Classical ML", "SVM, KNN, Naive Bayes", "G"], ["Classical ML", "Clustering & dimensionality reduction (k-means, PCA, t-SNE)", "M"], ["Classical ML", "Model evaluation & cross-validation", "M"], ["Classical ML", "Hyperparameter tuning (Optuna, GridSearch)", "M"], ["Classical ML", "Handling imbalanced data", "M"], ["Classical ML", "Feature engineering & selection", "M"], ["Classical ML", "Time series forecasting", "G"], ["Deep Learning", "Neural networks & backpropagation", "M"], ["Deep Learning", "PyTorch", "M"], ["Deep Learning", "TensorFlow / Keras", "G"], ["Deep Learning", "CNNs", "M"], ["Deep Learning", "RNN / LSTM / GRU", "G"], ["Deep Learning", "Transformers", "M"], ["Deep Learning", "Transfer learning & fine-tuning", "M"], ["Deep Learning", "Regularization & optimizers (Adam, dropout, batch norm)", "M"], ["Deep Learning", "GANs / diffusion models (basics)", "G"], ["Specializations", "Computer vision (OpenCV, object detection, segmentation)", "G"], ["Specializations", "NLP (text classification, NER, seq2seq)", "G"], ["Specializations", "Recommender systems", "G"], ["Specializations", "Reinforcement learning basics", "G"], ["MLOps", "Experiment tracking (MLflow, Weights & Biases)", "M"], ["MLOps", "Data & model versioning (DVC)", "G"], ["MLOps", "ML pipelines & orchestration (Airflow, Kubeflow)", "G"], ["MLOps", "Model serving (FastAPI, ONNX, TorchServe, TF Serving)", "M"], ["MLOps", "Docker & Kubernetes basics", "M"], ["MLOps", "Monitoring & data/model drift detection", "M"], ["MLOps", "CI/CD for ML", "G"], ["MLOps", "Cloud ML platforms (SageMaker, Vertex AI, Azure ML)", "G"], ["MLOps", "Big data tools (Spark)", "G"], ["Practice", "Model explainability (SHAP, LIME)", "G"], ["Practice", "Responsible AI (bias, fairness, privacy)", "G"], ["Practice", "Kaggle competitions", "G"], ["Practice", "2-3 end-to-end ML projects (data to deployment)", "M"]]}, "sde": {"name": "SDE", "items": [["Programming", "One language in depth (Java / C++ / Python)", "M"], ["Programming", "Object-oriented programming (4 pillars, SOLID)", "M"], ["Programming", "Design patterns (Singleton, Factory, Observer, etc.)", "G"], ["Programming", "Testing (unit, integration, TDD)", "M"], ["Programming", "Debugging & clean code practices", "M"], ["DSA", "Time & space complexity analysis", "M"], ["DSA", "Arrays & strings", "M"], ["DSA", "Two pointers & sliding window", "M"], ["DSA", "Hashing (maps & sets)", "M"], ["DSA", "Linked lists", "M"], ["DSA", "Stacks & queues", "M"], ["DSA", "Recursion & backtracking", "M"], ["DSA", "Binary search & sorting algorithms", "M"], ["DSA", "Trees & binary search trees", "M"], ["DSA", "Heaps / priority queues", "M"], ["DSA", "Graphs (BFS, DFS, Dijkstra, topological sort)", "M"], ["DSA", "Dynamic programming", "M"], ["DSA", "Greedy algorithms", "M"], ["DSA", "Tries & union-find", "G"], ["DSA", "Bit manipulation", "G"], ["CS Fundamentals", "Operating systems (processes, threads, memory, deadlocks)", "M"], ["CS Fundamentals", "DBMS (normalization, indexing, transactions, ACID)", "M"], ["CS Fundamentals", "Computer networks (TCP/IP, HTTP, DNS)", "M"], ["Databases", "SQL (joins, subqueries, window functions)", "M"], ["Databases", "NoSQL (MongoDB, Redis)", "G"], ["Backend", "REST API design", "M"], ["Backend", "Authentication & authorization (JWT, OAuth)", "M"], ["Backend", "Backend framework (Spring Boot / Node / Django / FastAPI)", "M"], ["Backend", "Caching (Redis) & rate limiting", "G"], ["Backend", "Message queues (Kafka, RabbitMQ)", "G"], ["Backend", "Microservices basics", "G"], ["Frontend", "HTML, CSS & JavaScript basics", "G"], ["Frontend", "React (or similar framework)", "G"], ["Tools & DevOps", "Git branching, PRs & code reviews", "M"], ["Tools & DevOps", "Linux & shell scripting", "M"], ["Tools & DevOps", "Docker", "M"], ["Tools & DevOps", "CI/CD pipelines", "G"], ["Tools & DevOps", "Cloud basics (AWS / GCP / Azure)", "G"], ["Tools & DevOps", "Agile / Scrum workflow", "G"], ["System Design", "Low-level design (class design, UML)", "M"], ["System Design", "High-level design (scaling, load balancing, CAP, sharding)", "M"], ["System Design", "Classic designs (URL shortener, chat app, news feed)", "G"], ["Interview Prep", "Consistent coding practice (LeetCode / GeeksforGeeks)", "M"], ["Interview Prep", "Aptitude & logical reasoning (campus placements)", "M"], ["Interview Prep", "Behavioral interviews (STAR method)", "M"], ["Interview Prep", "Mock interviews", "G"], ["Interview Prep", "Resume & GitHub portfolio polish", "M"]]}};
+
+function seedSkills(){
+  const roles = {};
+  Object.keys(SEED).forEach(k=>{
+    roles[k] = {name:SEED[k].name, items:SEED[k].items.map((r,i)=>({id:k+(i+1), cat:r[0], skill:r[1], pri:r[2]==='M'?'Must-have':'Good-to-have'}))};
+  });
+  return {roles, progress:{}, targets:{}, nextId:1000};
+}
+function ensureSkills(s){
+  if(!s.skills || !s.skills.roles){ s.skills = seedSkills(); return; }
+  s.skills.progress = s.skills.progress || {};
+  s.skills.targets = s.skills.targets || {};
+  s.skills.nextId = s.skills.nextId || 1000;
+}
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+const KEY = 'daily-tracker-v1';
+const DEFAULTS = ['Exercise','LeetCode','GitHub','Project','HackerRank','HackerEarth','CodeChef','Codeforces','Course'];
+
+function fresh(){
+<<<<<<< HEAD
+  return {activities: DEFAULTS.map((n,i)=>({id:'a'+(i+1), name:n})), days:{}, nextId:DEFAULTS.length+1, lastExport:null, skills:seedSkills()};
+=======
+  return {activities: DEFAULTS.map((n,i)=>({id:'a'+(i+1), name:n})), days:{}, nextId:DEFAULTS.length+1, lastExport:null};
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+}
+function load(){
+  try{
+    const s = JSON.parse(localStorage.getItem(KEY));
+<<<<<<< HEAD
+    if(s && Array.isArray(s.activities) && s.days){ ensureSkills(s); return s; }
+=======
+    if(s && Array.isArray(s.activities) && s.days) return s;
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+  }catch(e){}
+  return fresh();
+}
+let state = load();
+let view = 'today', cur = fmt(new Date()), range = 30;
+
+function save(quiet){
+  try{ localStorage.setItem(KEY, JSON.stringify(state)); if(!quiet) toast('Saved'); }
+  catch(e){ toast('Could not save. Export a backup now.'); }
+}
+let tt;
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('on'),1400); }
+
+/* ---------- date helpers (local time, never UTC) ---------- */
+function fmt(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+function addDays(s,n){ const d=parse(s); d.setDate(d.getDate()+n); return fmt(d); }
+const todayStr = () => fmt(new Date());
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- data helpers ---------- */
+const acts = () => state.activities;
+function isDone(date,id){ const d=state.days[date]; return !!(d && d.done && d.done.includes(id)); }
+function doneCount(date){ return acts().filter(a=>isDone(date,a.id)).length; }
+function toggle(date,id){
+  const d = state.days[date] || (state.days[date]={done:[],note:''});
+  const i = d.done.indexOf(id);
+  if(i>=0) d.done.splice(i,1); else d.done.push(id);
+  if(!d.done.length && !d.note) delete state.days[date];
+  save(true); render();
+}
+function setNote(v){
+  const d = state.days[cur] || (state.days[cur]={done:[],note:''});
+  d.note = v;
+  if(!d.done.length && !d.note) delete state.days[cur];
+  save(true);
+}
+function currentStreak(id){
+  let d = todayStr();
+  if(!isDone(d,id)) d = addDays(d,-1);
+  let n=0; while(isDone(d,id)){ n++; d=addDays(d,-1); }
+  return n;
+}
+function earliest(){
+  const ks = Object.keys(state.days).sort();
+  return ks.length ? ks[0] : todayStr();
+}
+function bestStreak(id){
+  let best=0, run=0, d=earliest(); const end=todayStr();
+  while(d<=end){ if(isDone(d,id)){ run++; best=Math.max(best,run); } else run=0; d=addDays(d,1); }
+  return best;
+}
+function dayList(n){
+  const end=todayStr(); let start;
+  if(n==='all'){ start=earliest(); const min=addDays(end,-6); if(start>min) start=min; }
+  else start=addDays(end,-(n-1));
+  const out=[]; for(let d=start; d<=end; d=addDays(d,1)) out.push(d);
+  return out;
+}
+
+/* ---------- views ---------- */
+function render(){
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
+  const m=document.getElementById('main');
+<<<<<<< HEAD
+  m.innerHTML = view==='today' ? vToday() : view==='review' ? vReview() : view==='skills' ? vSkills() : view==='roadmap' ? vRoadmap() : vSettings();
+=======
+  m.innerHTML = view==='today' ? vToday() : view==='review' ? vReview() : vSettings();
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+}
+document.getElementById('nav').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return; view=b.dataset.v; render();
+});
+
+function backupBanner(){
+  const has = Object.keys(state.days).length>0;
+  if(!has) return '';
+  const last = state.lastExport ? parse(state.lastExport) : null;
+  const age = last ? Math.floor((Date.now()-last.getTime())/86400000) : 999;
+  if(age<7) return '';
+  return `<div class="banner"><span>${last?`Last backup was ${age} days ago.`:'You have not backed up your data yet.'}</span><button class="btn" onclick="exportJSON()">Download backup</button></div>`;
+}
+
+function vToday(){
+  const list=acts(), n=list.length, k=doneCount(cur);
+  const day=state.days[cur]||{done:[],note:''};
+  const pct = n? Math.round(k/n*100):0;
+  const label = parse(cur).toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  const items = list.map((a,i)=>{
+    const dn=isDone(cur,a.id), s=currentStreak(a.id);
+    return `<button class="item ${dn?'done':''}" onclick="toggle('${cur}','${a.id}')">
+      <span class="box">${dn?'✓':''}</span>
+      <span class="name">${esc(a.name)}</span>
+      ${s>1?`<span class="streak">🔥 ${s} days</span>`:''}
+      ${i<9?`<span class="key">${i+1}</span>`:''}
+    </button>`;
+  }).join('');
+  return `${backupBanner()}
+  <div class="datebar">
+    <h2>${label}${cur===todayStr()?' <span class="muted">· today</span>':''}</h2>
+    <div class="row">
+      <button class="btn" onclick="go(-1)">←</button>
+      <input type="date" value="${cur}" onchange="pick(this.value)">
+      <button class="btn" onclick="go(1)">→</button>
+      <button class="btn" onclick="pick(todayStr())">Today</button>
+    </div>
+  </div>
+  <div class="row"><strong>${k} / ${n} done</strong><span class="muted">${pct}%</span></div>
+  <div class="progress"><i style="width:${pct}%"></i></div>
+  ${items || '<p class="muted">No activities yet. Add some in Settings.</p>'}
+  <h3 style="margin-top:18px">Notes for this day</h3>
+  <textarea placeholder="What did you solve, ship or learn?" oninput="setNote(this.value)">${esc(day.note||'')}</textarea>
+  <p class="muted" style="font-size:12px">Shortcuts: 1–9 toggle an item · ← → change day · T jumps to today</p>`;
+}
+function go(n){ cur=addDays(cur,n); render(); }
+function pick(v){ if(v){ cur=v; render(); } }
+
+function vReview(){
+  const days=dayList(range), list=acts(), n=list.length;
+  const per = days.map(d=>doneCount(d));
+  const totalDone = per.reduce((a,b)=>a+b,0);
+  const avg = n&&days.length ? Math.round(totalDone/(n*days.length)*100) : 0;
+  const perfect = n? per.filter(x=>x===n).length : 0;
+  const active = per.filter(x=>x>0).length;
+  // active-day streak
+  let st=0, d=todayStr(); if(doneCount(d)===0) d=addDays(d,-1);
+  while(doneCount(d)>0){ st++; d=addDays(d,-1); }
+
+  const rows = list.map(a=>{
+    const c=days.filter(x=>isDone(x,a.id)).length;
+    const p=days.length?Math.round(c/days.length*100):0;
+    return `<tr><td><strong>${esc(a.name)}</strong></td><td>${c} / ${days.length}</td>
+      <td style="width:28%"><div class="bar"><i style="width:${p}%"></i></div></td><td>${p}%</td>
+      <td>${currentStreak(a.id)}</td><td>${bestStreak(a.id)}</td></tr>`;
+  }).join('');
+
+  const cols = days.length;
+  const step = cols<=31?1:cols<=100?5:10;
+  const head = `<div></div>` + days.map((x,i)=>`<div class="h">${i%step===0?parse(x).getDate():''}</div>`).join('');
+  const heat = head + list.map(a=>
+    `<div class="lab">${esc(a.name)}</div>` + days.map(x=>`<div class="c ${isDone(x,a.id)?'d':''}" title="${esc(a.name)} · ${x}"></div>`).join('')
+  ).join('');
+
+  const bars = days.map((x,i)=>{
+    const p=n?per[i]/n*100:0;
+    return `<i class="${per[i]?'':'z'}" style="height:${Math.max(p,3)}%" title="${x}: ${per[i]}/${n}"></i>`;
+  }).join('');
+
+  const notes = days.slice().reverse().filter(x=>state.days[x]&&state.days[x].note).slice(0,8).map(x=>
+    `<tr><td style="white-space:nowrap" class="muted">${parse(x).toLocaleDateString(undefined,{day:'numeric',month:'short'})}</td><td>${esc(state.days[x].note)}</td></tr>`).join('');
+
+  const seg=[7,30,90,'all'].map(r=>`<button class="${range===r?'on':''}" onclick="range=${typeof r==='string'?`'${r}'`:r};render()">${r==='all'?'All':r+'d'}</button>`).join('');
+
+  return `<div class="stack">
+  ${backupBanner()}
+  <div class="row" style="justify-content:space-between"><h2 style="margin:0;font-size:18px">Review</h2><div class="seg">${seg}</div></div>
+  <div class="tiles">
+    <div class="card tile"><div class="l">Avg completion</div><div class="v">${avg}%</div></div>
+    <div class="card tile"><div class="l">Perfect days</div><div class="v">${perfect}</div></div>
+    <div class="card tile"><div class="l">Active days</div><div class="v">${active}<span class="muted" style="font-size:15px"> / ${days.length}</span></div></div>
+    <div class="card tile"><div class="l">Current streak</div><div class="v">${st}<span class="muted" style="font-size:15px"> days</span></div></div>
+  </div>
+  <div class="card"><h3>Daily completion</h3><div class="bars">${bars}</div></div>
+  <div class="card scroll"><h3>Activity heatmap</h3>
+    <div class="heat" style="grid-template-columns:auto repeat(${cols},16px)">${heat}</div></div>
+  <div class="card scroll"><h3>By activity</h3>
+    <table><tr><th>Activity</th><th>Done</th><th></th><th>Rate</th><th>Streak</th><th>Best</th></tr>${rows}</table></div>
+  ${notes?`<div class="card"><h3>Recent notes</h3><table>${notes}</table></div>`:''}
+  </div>`;
+}
+
+function vSettings(){
+  const list=acts().map((a,i)=>`<div class="row" style="margin-bottom:8px">
+    <input type="text" value="${esc(a.name)}" style="flex:1" onchange="rename('${a.id}',this.value)">
+    <button class="btn" onclick="move(${i},-1)" ${i===0?'disabled':''}>↑</button>
+    <button class="btn" onclick="move(${i},1)" ${i===acts().length-1?'disabled':''}>↓</button>
+    <button class="btn danger" onclick="removeAct('${a.id}')">Remove</button></div>`).join('');
+  const total=Object.keys(state.days).length;
+  return `<div class="stack">
+  <div class="card"><h3>Activities</h3>${list}
+    <div class="row" style="margin-top:12px"><input type="text" id="newAct" placeholder="New activity, e.g. Read paper" style="flex:1" onkeydown="if(event.key==='Enter')addAct()">
+    <button class="btn primary" onclick="addAct()">Add</button></div></div>
+  <div class="card"><h3>Your data</h3>
+<<<<<<< HEAD
+    <p class="muted" style="margin-top:0">Everything is stored on this Mac, inside this browser or app. ${total} day(s) recorded. Skills and roadmap progress are saved here too. ${state.lastExport?'Last backup: '+state.lastExport+'.':'No backup yet.'}</p>
+=======
+    <p class="muted" style="margin-top:0">Everything is stored on this Mac, inside this browser or app. ${total} day(s) recorded. ${state.lastExport?'Last backup: '+state.lastExport+'.':'No backup yet.'}</p>
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+    <div class="row" style="flex-wrap:wrap">
+      <button class="btn primary" onclick="exportJSON()">Download backup (JSON)</button>
+      <button class="btn" onclick="exportCSV()">Export CSV</button>
+      <label class="btn">Restore from backup<input type="file" accept="application/json" hidden onchange="importJSON(this.files[0])"></label>
+      <button class="btn danger" onclick="resetAll()">Erase everything</button>
+    </div></div></div>`;
+}
+function rename(id,v){ const a=acts().find(x=>x.id===id); v=v.trim(); if(a&&v){ a.name=v; save(); } render(); }
+function move(i,dir){ const l=acts(), j=i+dir; if(j<0||j>=l.length) return; [l[i],l[j]]=[l[j],l[i]]; save(true); render(); }
+function addAct(){
+  const el=document.getElementById('newAct'); const v=el.value.trim(); if(!v) return;
+  state.activities.push({id:'a'+(state.nextId++), name:v}); save(); render();
+}
+function removeAct(id){
+  const a=acts().find(x=>x.id===id);
+  if(!confirm(`Remove "${a.name}"? Its history stays in your backup file but disappears from the app.`)) return;
+  state.activities=state.activities.filter(x=>x.id!==id); save(); render();
+}
+
+/* ---------- backup ---------- */
+function download(name,text,type){
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportJSON(){
+  state.lastExport=todayStr(); save(true);
+  download(`daily-tracker-backup-${todayStr()}.json`, JSON.stringify(state,null,2), 'application/json');
+  toast('Backup downloaded'); render();
+}
+function exportCSV(){
+  const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+  const head=['Date',...acts().map(a=>q(a.name)),'Done','Note'].join(',');
+  const rows=Object.keys(state.days).sort().map(d=>[d,...acts().map(a=>isDone(d,a.id)?1:0),doneCount(d),q(state.days[d].note||'')].join(','));
+  download(`daily-tracker-${todayStr()}.csv`, [head,...rows].join('\n'), 'text/csv');
+}
+function importJSON(file){
+  if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const s=JSON.parse(r.result);
+      if(!Array.isArray(s.activities)||typeof s.days!=='object') throw 0;
+      if(!confirm('Replace the data in this app with the backup?')) return;
+<<<<<<< HEAD
+      state=s; if(!state.nextId) state.nextId=state.activities.length+100; ensureSkills(state); save(); render();
+=======
+      state=s; if(!state.nextId) state.nextId=state.activities.length+100; save(); render();
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+    }catch(e){ alert('That file is not a valid tracker backup.'); }
+  };
+  r.readAsText(file);
+}
+function resetAll(){
+  if(!confirm('Erase all activities, history and notes from this app? Download a backup first if unsure.')) return;
+  state=fresh(); save(); render();
+}
+
+<<<<<<< HEAD
+/* ---------- Skills & Roadmap ---------- */
+const STATUSES = ['Not Started','In Progress','Completed'];
+let sRole = 'overview', rRole = 'ai', sf = {pri:'all', st:'all', cat:'all', q:''};
+const SK = () => state.skills;
+const roleKeys = () => Object.keys(SK().roles);
+const pctOf = (a,b) => b ? Math.round(a/b*100) : 0;
+function prog(id){ return SK().progress[id] || {s:'Not Started', d:'', n:''}; }
+function storeProg(id,p){
+  if(p.s==='Not Started' && !p.d && !p.n) delete SK().progress[id]; else SK().progress[id]=p;
+  save(true);
+}
+function setStatus(id,s){
+  const p=Object.assign({},prog(id)), was=p.s; p.s=s;
+  if(s==='Completed'){ if(!p.d) p.d=todayStr(); } else if(was==='Completed') p.d='';
+  storeProg(id,p);
+}
+function setDate(id,v){ const p=Object.assign({},prog(id)); p.d=v; storeProg(id,p); }
+function setSkillNote(id,v){ const p=Object.assign({},prog(id)); p.n=v.trim(); storeProg(id,p); }
+function cycle(id){ setStatus(id, STATUSES[(STATUSES.indexOf(prog(id).s)+1)%3]); render(); }
+function quick(id,s){ setStatus(id,s); render(); }
+function roleStats(k){
+  const it=SK().roles[k].items; let c=0, ip=0, m=0, mc=0;
+  it.forEach(x=>{ const s=prog(x.id).s; if(s==='Completed') c++; else if(s==='In Progress') ip++;
+    if(x.pri==='Must-have'){ m++; if(s==='Completed') mc++; } });
+  return {total:it.length, c, ip, ns:it.length-c-ip, m, mc};
+}
+const catsOf = items => [...new Set(items.map(x=>x.cat))];
+
+function vSkills(){
+  if(sRole!=='overview' && !SK().roles[sRole]) sRole='overview';
+  const tabs=[['overview','Overview'], ...roleKeys().map(k=>[k,SK().roles[k].name])];
+  const seg=tabs.map(([k,n])=>`<button class="${sRole===k?'on':''}" onclick="sRole='${k}';sf={pri:'all',st:'all',cat:'all',q:''};render()">${esc(n)}</button>`).join('');
+  return `<div class="stack">
+    <div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 style="margin:0;font-size:18px">Skills</h2><div class="seg">${seg}</div></div>
+    ${sRole==='overview' ? skillsOverview() : skillsRole(sRole)}</div>`;
+}
+function skillsOverview(){
+  const T={total:0,c:0,ip:0,ns:0,m:0,mc:0};
+  const row=(name,s,btn)=>`<tr><td><strong>${esc(name)}</strong></td><td>${s.total}</td><td>${s.c}</td><td>${s.ip}</td><td>${s.ns}</td>
+    <td style="min-width:110px"><div class="bar"><i style="width:${pctOf(s.c,s.total)}%"></i></div></td><td>${pctOf(s.c,s.total)}%</td>
+    <td>${s.m}</td><td>${s.mc}</td><td>${pctOf(s.mc,s.m)}%</td><td>${btn||''}</td></tr>`;
+  const rows=roleKeys().map(k=>{ const s=roleStats(k); Object.keys(T).forEach(x=>T[x]+=s[x]);
+    return row(SK().roles[k].name, s, `<button class="btn" onclick="sRole='${k}';render()">Open</button>`); }).join('');
+  return `<div class="card scroll"><table>
+    <tr><th>Role</th><th>Total</th><th>Done</th><th>In progress</th><th>Not started</th><th></th><th>% done</th><th>Must-haves</th><th>Must done</th><th>Must %</th><th></th></tr>
+    ${rows}${row('All roles (combined)',T)}</table>
+    <p class="muted" style="font-size:12px;margin-bottom:0">The roles overlap (Python, Git, SQL, Docker, Transformers), so shared skills are counted once per role in the combined row.</p></div>
+    <div class="row" style="flex-wrap:wrap"><button class="btn" onclick="exportSkillsCSV()">Export skills CSV</button>
+    <button class="btn" onclick="view='roadmap';render()">Open roadmap →</button></div>`;
+}
+function skillsRole(k){
+  const items=SK().roles[k].items, cats=catsOf(items);
+  const opt=(v,l,cur)=>`<option value="${esc(v)}" ${cur===v?'selected':''}>${esc(l)}</option>`;
+  return `<div class="row" style="flex-wrap:wrap;gap:8px">
+    <input type="text" placeholder="Search skills or notes" value="${esc(sf.q)}" oninput="sf.q=this.value;sRefresh('${k}')" style="flex:1;min-width:180px">
+    <select onchange="sf.pri=this.value;sRefresh('${k}')">${opt('all','All priorities',sf.pri)}${opt('Must-have','Must-have',sf.pri)}${opt('Good-to-have','Good-to-have',sf.pri)}</select>
+    <select onchange="sf.st=this.value;sRefresh('${k}')">${opt('all','All statuses',sf.st)}${STATUSES.map(s=>opt(s,s,sf.st)).join('')}</select>
+    <select onchange="sf.cat=this.value;sRefresh('${k}')">${opt('all','All categories',sf.cat)}${cats.map(c=>opt(c,c,sf.cat)).join('')}</select></div>
+    <div id="sbody">${skillsBody(k)}</div>
+    <div class="card"><h3>Add a skill</h3><div class="row" style="flex-wrap:wrap;gap:8px">
+      <input type="text" id="nsCat" list="catlist" placeholder="Category" style="width:180px">
+      <datalist id="catlist">${cats.map(c=>`<option value="${esc(c)}">`).join('')}</datalist>
+      <input type="text" id="nsName" placeholder="Skill" style="flex:1;min-width:200px" onkeydown="if(event.key==='Enter')addSkill('${k}')">
+      <select id="nsPri"><option>Must-have</option><option>Good-to-have</option></select>
+      <button class="btn primary" onclick="addSkill('${k}')">Add</button></div></div>`;
+}
+function sRefresh(k){ const el=document.getElementById('sbody'); if(el) el.innerHTML=skillsBody(k); }
+function skillRow(k,x){
+  const p=prog(x.id), si=STATUSES.indexOf(p.s);
+  return `<div class="srow ${p.s==='Completed'?'sdone':''}">
+    <select class="st st${si}" onchange="setStatus('${x.id}',this.value);sRefresh('${k}')">${STATUSES.map(s=>`<option value="${s}" ${s===p.s?'selected':''}>${s}</option>`).join('')}</select>
+    <div class="sname">${esc(x.skill)}<span class="pri ${x.pri==='Must-have'?'m':''}">${x.pri==='Must-have'?'Must':'Good'}</span></div>
+    <input type="date" value="${esc(p.d)}" title="Date completed" onchange="setDate('${x.id}',this.value)">
+    <input type="text" placeholder="Notes / resource" value="${esc(p.n)}" onchange="setSkillNote('${x.id}',this.value)">
+    <button class="x" title="Remove skill" onclick="delSkill('${k}','${x.id}')">✕</button></div>`;
+}
+function skillsBody(k){
+  const s=roleStats(k), items=SK().roles[k].items, f=sf, q=f.q.trim().toLowerCase();
+  const list=items.filter(x=>{ const p=prog(x.id);
+    return (f.pri==='all'||x.pri===f.pri) && (f.st==='all'||p.s===f.st) && (f.cat==='all'||x.cat===f.cat) &&
+           (!q || (x.skill+' '+x.cat+' '+p.n).toLowerCase().includes(q)); });
+  const groups=catsOf(list).map(c=>{
+    const all=items.filter(x=>x.cat===c), dn=all.filter(x=>prog(x.id).s==='Completed').length;
+    return `<div class="cat"><h4>${esc(c)}</h4><span class="muted" style="font-size:12px">${dn} / ${all.length} done</span></div>` +
+           list.filter(x=>x.cat===c).map(x=>skillRow(k,x)).join('');
+  }).join('');
+  return `<div class="tiles" style="margin:14px 0">
+    <div class="card tile"><div class="l">Complete</div><div class="v">${pctOf(s.c,s.total)}%</div></div>
+    <div class="card tile"><div class="l">Completed</div><div class="v">${s.c}<span class="muted" style="font-size:15px"> / ${s.total}</span></div></div>
+    <div class="card tile"><div class="l">In progress</div><div class="v">${s.ip}</div></div>
+    <div class="card tile"><div class="l">Must-haves done</div><div class="v">${s.mc}<span class="muted" style="font-size:15px"> / ${s.m}</span></div></div></div>
+    <div class="card">${groups || '<p class="muted" style="margin:0">No skills match these filters.</p>'}</div>`;
+}
+function addSkill(k){
+  const name=document.getElementById('nsName').value.trim(); if(!name) return;
+  const cat=document.getElementById('nsCat').value.trim()||'Other', pri=document.getElementById('nsPri').value;
+  SK().roles[k].items.push({id:'c'+(SK().nextId++), cat, skill:name, pri}); save(); render();
+}
+function delSkill(k,id){
+  const x=SK().roles[k].items.find(i=>i.id===id);
+  if(!confirm(`Remove "${x.skill}" from ${SK().roles[k].name}?`)) return;
+  SK().roles[k].items=SK().roles[k].items.filter(i=>i.id!==id); delete SK().progress[id]; save(); render();
+}
+function exportSkillsCSV(){
+  const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+  const rows=[['Role','Category','Skill','Priority','Status','Date Completed','Notes'].join(',')];
+  roleKeys().forEach(k=>SK().roles[k].items.forEach(x=>{ const p=prog(x.id);
+    rows.push([SK().roles[k].name,x.cat,x.skill,x.pri,p.s,p.d,p.n].map(q).join(',')); }));
+  download(`skills-tracker-${todayStr()}.csv`, rows.join('\n'), 'text/csv');
+}
+
+function setTarget(i,v){
+  const key=rRole+'|'+catsOf(SK().roles[rRole].items)[i];
+  if(v) SK().targets[key]=v; else delete SK().targets[key];
+  save(); render();
+}
+function vRoadmap(){
+  if(!SK().roles[rRole]) rRole=roleKeys()[0];
+  const k=rRole, role=SK().roles[k], items=role.items, s=roleStats(k);
+  const seg=roleKeys().map(r=>`<button class="${r===k?'on':''}" onclick="rRole='${r}';render()">${esc(SK().roles[r].name)}</button>`).join('');
+  const stages=catsOf(items).map(c=>{
+    const it=items.filter(x=>x.cat===c);
+    return {c, it, total:it.length,
+      d:it.filter(x=>prog(x.id).s==='Completed').length,
+      ip:it.filter(x=>prog(x.id).s==='In Progress').length,
+      mLeft:it.filter(x=>x.pri==='Must-have' && prog(x.id).s!=='Completed').length};
+  });
+  const cur=stages.findIndex(z=>z.d<z.total);
+  const rank=x=>prog(x.id).s==='In Progress' ? 0 : x.pri==='Must-have' ? 1 : 2;
+  const next=items.map((x,i)=>({x,i})).filter(o=>prog(o.x.id).s!=='Completed')
+    .sort((a,b)=>rank(a.x)-rank(b.x)||a.i-b.i).slice(0,6).map(o=>o.x);
+  const nextHtml=next.map(x=>{ const st=prog(x.id).s;
+    return `<div class="next"><div class="grow"><strong>${esc(x.skill)}</strong>
+      <div class="muted" style="font-size:12px">${esc(x.cat)} · ${x.pri}${st==='In Progress'?' · in progress':''}</div></div>
+      ${st==='Not Started'?`<button class="btn" onclick="quick('${x.id}','In Progress')">Start</button>`:''}
+      <button class="btn primary" onclick="quick('${x.id}','Completed')">Done</button></div>`; }).join('');
+  const chip=x=>{ const st=prog(x.id).s;
+    return `<button class="chip ${x.pri==='Must-have'?'m':''} ${st==='Completed'?'c':st==='In Progress'?'ip':''}" onclick="cycle('${x.id}')" title="${st} · ${x.pri} · click to change">${esc(x.skill)}</button>`; };
+  const label={done:'Done',cur:'Current',started:'Started',later:'Later'};
+  const stageHtml=stages.map((z,i)=>{
+    const complete=z.d===z.total, sk=complete?'done':i===cur?'cur':(z.d||z.ip)?'started':'later';
+    const tg=SK().targets[k+'|'+z.c]||''; let info='';
+    if(tg && !complete){
+      const days=Math.round((parse(tg)-parse(todayStr()))/86400000);
+      info = days<0 ? `<span class="over">${-days} day${days===-1?'':'s'} overdue</span>`
+           : days===0 ? `<span class="over">due today</span>`
+           : `<span class="muted">${days} day${days===1?'':'s'} left</span>`;
+    }
+    return `<div class="stage ${sk}"><div class="dot">${complete?'✓':i+1}</div><div class="card">
+      <div class="row" style="flex-wrap:wrap;gap:8px"><strong>${esc(z.c)}</strong><span class="tag ${sk}">${label[sk]}</span><span style="flex:1"></span>
+        <span class="muted" style="font-size:13px">${z.d} / ${z.total} done${z.mLeft?` · ${z.mLeft} must-have left`:''}</span></div>
+      <div class="progress" style="margin:8px 0 6px"><i style="width:${pctOf(z.d,z.total)}%"></i></div>
+      <div class="row" style="flex-wrap:wrap;gap:8px;font-size:13px"><span class="muted">Target date</span>
+        <input type="date" value="${esc(tg)}" onchange="setTarget(${i},this.value)" style="padding:4px 8px;font-size:13px">${info}</div>
+      <div class="chips">${z.it.map(chip).join('')}</div></div></div>`;
+  }).join('');
+  return `<div class="stack">
+    <div class="row" style="justify-content:space-between;flex-wrap:wrap"><h2 style="margin:0;font-size:18px">Roadmap</h2><div class="seg">${seg}</div></div>
+    <div class="card"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <div><div class="muted" style="font-size:12px;text-transform:uppercase;letter-spacing:.05em">${esc(role.name)}</div>
+        <div style="font-size:26px;font-weight:700;letter-spacing:-.02em">${pctOf(s.c,s.total)}% complete</div></div>
+      <div class="muted" style="text-align:right">${s.c} / ${s.total} skills · must-haves ${s.mc} / ${s.m}<br>${cur>=0?`Current stage: <strong>${esc(stages[cur].c)}</strong>`:'Every stage is done 🎉'}</div></div>
+      <div class="progress" style="margin-bottom:0"><i style="width:${pctOf(s.c,s.total)}%"></i></div></div>
+    <div class="card"><h3>Up next</h3>${nextHtml || '<p class="muted" style="margin:0">Nothing left, every skill is completed.</p>'}</div>
+    <div><h3 style="margin-bottom:4px">Stages</h3>
+      <p class="muted" style="margin:0 0 12px;font-size:12px">Stages follow the order of your sheet. Click a skill to cycle Not started → In progress → Completed. Bold outline = must-have.</p>
+      <div class="tl">${stageHtml}</div></div></div>`;
+}
+
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
+/* ---------- keyboard ---------- */
+document.addEventListener('keydown',e=>{
+  if(view!=='today') return;
+  const t=e.target.tagName; if(t==='INPUT'||t==='TEXTAREA') return;
+  if(e.metaKey||e.ctrlKey||e.altKey) return;
+  if(/^[1-9]$/.test(e.key)){ const a=acts()[+e.key-1]; if(a) toggle(cur,a.id); }
+  else if(e.key==='ArrowLeft') go(-1);
+  else if(e.key==='ArrowRight') go(1);
+  else if(e.key==='t'||e.key==='T') pick(todayStr());
+});
+render();
+</script>
+</body>
+</html>
