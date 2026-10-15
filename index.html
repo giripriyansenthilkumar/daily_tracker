@@ -70,6 +70,7 @@ input[type=text],input[type=date]{font:inherit;border:1px solid var(--line);bord
 .banner{background:var(--warn-weak);color:var(--warn);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-weight:600;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:99px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none}
 #toast.on{opacity:.92}
+<<<<<<< HEAD
 
 :root{--amber:#a16207;--amber-weak:#fdf0cf;--red:#b42318}
 @media (prefers-color-scheme:dark){:root{--amber:#e7b24c;--amber-weak:#3a3020;--red:#f0786a}}
@@ -111,6 +112,8 @@ select.st2{background:var(--accent-weak);color:var(--accent);border-color:var(--
 .next:last-child{border-bottom:0}
 .next .grow{flex:1}
 .over{color:var(--red);font-weight:600}
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
 </style>
 </head>
 <body>
@@ -120,8 +123,11 @@ select.st2{background:var(--accent-weak);color:var(--accent);border-color:var(--
     <nav id="nav">
       <button data-v="today">Today</button>
       <button data-v="review">Review</button>
+<<<<<<< HEAD
       <button data-v="skills">Skills</button>
       <button data-v="roadmap">Roadmap</button>
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
       <button data-v="settings">Settings</button>
     </nav>
   </header>
@@ -129,6 +135,7 @@ select.st2{background:var(--accent-weak);color:var(--accent);border-color:var(--
 </div>
 <div id="toast"></div>
 <script>
+<<<<<<< HEAD
 const SEED = {"ai": {"name": "AI Engineer", "items": [["Foundations", "Python (advanced: OOP, async, decorators, typing)", "M"], ["Foundations", "Git & GitHub workflows", "M"], ["Foundations", "Linux & command line", "M"], ["Foundations", "REST APIs & JSON handling", "M"], ["Foundations", "SQL basics", "M"], ["ML & DL Basics", "ML fundamentals (supervised/unsupervised, bias-variance, metrics)", "M"], ["ML & DL Basics", "Deep learning basics with PyTorch", "M"], ["ML & DL Basics", "Transformers & attention mechanism", "M"], ["ML & DL Basics", "NLP basics (tokenization, embeddings)", "M"], ["LLM Applications", "Prompt engineering (few-shot, CoT, system prompts)", "M"], ["LLM Applications", "LLM APIs (OpenAI, Anthropic, Gemini)", "M"], ["LLM Applications", "Structured outputs, function calling & tool use", "M"], ["LLM Applications", "RAG pipelines (end to end)", "M"], ["LLM Applications", "Embeddings & chunking strategies", "M"], ["LLM Applications", "Vector databases (FAISS, Chroma, Pinecone, pgvector)", "M"], ["LLM Applications", "Hybrid search & reranking", "G"], ["LLM Applications", "LangChain / LlamaIndex", "M"], ["LLM Applications", "Agents & multi-agent frameworks (LangGraph, CrewAI)", "M"], ["LLM Applications", "Model Context Protocol (MCP)", "G"], ["LLM Applications", "Memory & context management", "G"], ["Model Adaptation", "Hugging Face ecosystem (Transformers, Datasets, PEFT)", "M"], ["Model Adaptation", "Fine-tuning (LoRA / QLoRA)", "G"], ["Model Adaptation", "Running open-source LLMs (Llama, Mistral, Qwen) via Ollama / vLLM", "G"], ["Model Adaptation", "Quantization & inference optimization", "G"], ["Model Adaptation", "Multimodal models (vision, speech)", "G"], ["Evaluation & Safety", "LLM evaluation (RAGAS, LLM-as-judge, test sets)", "M"], ["Evaluation & Safety", "Guardrails & prompt-injection defense", "M"], ["Evaluation & Safety", "Observability & tracing (LangSmith, Langfuse)", "G"], ["Evaluation & Safety", "Hallucination mitigation techniques", "M"], ["Deployment", "FastAPI / Flask for serving AI apps", "M"], ["Deployment", "Streaming responses (SSE / WebSockets)", "G"], ["Deployment", "Docker & containerization", "M"], ["Deployment", "Cloud basics (AWS / GCP / Azure)", "M"], ["Deployment", "CI/CD basics", "G"], ["Deployment", "Cost & latency optimization", "G"], ["Deployment", "Quick UIs (Streamlit / Gradio) or React basics", "G"], ["Practice", "System design for AI applications", "G"], ["Practice", "Reading & implementing research papers", "G"], ["Practice", "2-3 deployed end-to-end AI projects in portfolio", "M"]]}, "ml": {"name": "ML Engineer", "items": [["Math", "Linear algebra (vectors, matrices, eigen, SVD)", "M"], ["Math", "Probability & statistics (distributions, hypothesis testing, Bayes)", "M"], ["Math", "Calculus & optimization (gradients, gradient descent)", "M"], ["Programming", "Python for data (NumPy, Pandas)", "M"], ["Programming", "Data visualization (Matplotlib, Seaborn, Plotly)", "M"], ["Programming", "SQL for data extraction & analysis", "M"], ["Programming", "Git & GitHub", "M"], ["Classical ML", "Linear & logistic regression", "M"], ["Classical ML", "Decision trees, Random Forest", "M"], ["Classical ML", "Gradient boosting (XGBoost, LightGBM, CatBoost)", "M"], ["Classical ML", "SVM, KNN, Naive Bayes", "G"], ["Classical ML", "Clustering & dimensionality reduction (k-means, PCA, t-SNE)", "M"], ["Classical ML", "Model evaluation & cross-validation", "M"], ["Classical ML", "Hyperparameter tuning (Optuna, GridSearch)", "M"], ["Classical ML", "Handling imbalanced data", "M"], ["Classical ML", "Feature engineering & selection", "M"], ["Classical ML", "Time series forecasting", "G"], ["Deep Learning", "Neural networks & backpropagation", "M"], ["Deep Learning", "PyTorch", "M"], ["Deep Learning", "TensorFlow / Keras", "G"], ["Deep Learning", "CNNs", "M"], ["Deep Learning", "RNN / LSTM / GRU", "G"], ["Deep Learning", "Transformers", "M"], ["Deep Learning", "Transfer learning & fine-tuning", "M"], ["Deep Learning", "Regularization & optimizers (Adam, dropout, batch norm)", "M"], ["Deep Learning", "GANs / diffusion models (basics)", "G"], ["Specializations", "Computer vision (OpenCV, object detection, segmentation)", "G"], ["Specializations", "NLP (text classification, NER, seq2seq)", "G"], ["Specializations", "Recommender systems", "G"], ["Specializations", "Reinforcement learning basics", "G"], ["MLOps", "Experiment tracking (MLflow, Weights & Biases)", "M"], ["MLOps", "Data & model versioning (DVC)", "G"], ["MLOps", "ML pipelines & orchestration (Airflow, Kubeflow)", "G"], ["MLOps", "Model serving (FastAPI, ONNX, TorchServe, TF Serving)", "M"], ["MLOps", "Docker & Kubernetes basics", "M"], ["MLOps", "Monitoring & data/model drift detection", "M"], ["MLOps", "CI/CD for ML", "G"], ["MLOps", "Cloud ML platforms (SageMaker, Vertex AI, Azure ML)", "G"], ["MLOps", "Big data tools (Spark)", "G"], ["Practice", "Model explainability (SHAP, LIME)", "G"], ["Practice", "Responsible AI (bias, fairness, privacy)", "G"], ["Practice", "Kaggle competitions", "G"], ["Practice", "2-3 end-to-end ML projects (data to deployment)", "M"]]}, "sde": {"name": "SDE", "items": [["Programming", "One language in depth (Java / C++ / Python)", "M"], ["Programming", "Object-oriented programming (4 pillars, SOLID)", "M"], ["Programming", "Design patterns (Singleton, Factory, Observer, etc.)", "G"], ["Programming", "Testing (unit, integration, TDD)", "M"], ["Programming", "Debugging & clean code practices", "M"], ["DSA", "Time & space complexity analysis", "M"], ["DSA", "Arrays & strings", "M"], ["DSA", "Two pointers & sliding window", "M"], ["DSA", "Hashing (maps & sets)", "M"], ["DSA", "Linked lists", "M"], ["DSA", "Stacks & queues", "M"], ["DSA", "Recursion & backtracking", "M"], ["DSA", "Binary search & sorting algorithms", "M"], ["DSA", "Trees & binary search trees", "M"], ["DSA", "Heaps / priority queues", "M"], ["DSA", "Graphs (BFS, DFS, Dijkstra, topological sort)", "M"], ["DSA", "Dynamic programming", "M"], ["DSA", "Greedy algorithms", "M"], ["DSA", "Tries & union-find", "G"], ["DSA", "Bit manipulation", "G"], ["CS Fundamentals", "Operating systems (processes, threads, memory, deadlocks)", "M"], ["CS Fundamentals", "DBMS (normalization, indexing, transactions, ACID)", "M"], ["CS Fundamentals", "Computer networks (TCP/IP, HTTP, DNS)", "M"], ["Databases", "SQL (joins, subqueries, window functions)", "M"], ["Databases", "NoSQL (MongoDB, Redis)", "G"], ["Backend", "REST API design", "M"], ["Backend", "Authentication & authorization (JWT, OAuth)", "M"], ["Backend", "Backend framework (Spring Boot / Node / Django / FastAPI)", "M"], ["Backend", "Caching (Redis) & rate limiting", "G"], ["Backend", "Message queues (Kafka, RabbitMQ)", "G"], ["Backend", "Microservices basics", "G"], ["Frontend", "HTML, CSS & JavaScript basics", "G"], ["Frontend", "React (or similar framework)", "G"], ["Tools & DevOps", "Git branching, PRs & code reviews", "M"], ["Tools & DevOps", "Linux & shell scripting", "M"], ["Tools & DevOps", "Docker", "M"], ["Tools & DevOps", "CI/CD pipelines", "G"], ["Tools & DevOps", "Cloud basics (AWS / GCP / Azure)", "G"], ["Tools & DevOps", "Agile / Scrum workflow", "G"], ["System Design", "Low-level design (class design, UML)", "M"], ["System Design", "High-level design (scaling, load balancing, CAP, sharding)", "M"], ["System Design", "Classic designs (URL shortener, chat app, news feed)", "G"], ["Interview Prep", "Consistent coding practice (LeetCode / GeeksforGeeks)", "M"], ["Interview Prep", "Aptitude & logical reasoning (campus placements)", "M"], ["Interview Prep", "Behavioral interviews (STAR method)", "M"], ["Interview Prep", "Mock interviews", "G"], ["Interview Prep", "Resume & GitHub portfolio polish", "M"]]}};
 
 function seedSkills(){
@@ -144,16 +151,26 @@ function ensureSkills(s){
   s.skills.targets = s.skills.targets || {};
   s.skills.nextId = s.skills.nextId || 1000;
 }
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
 const KEY = 'daily-tracker-v1';
 const DEFAULTS = ['Exercise','LeetCode','GitHub','Project','HackerRank','HackerEarth','CodeChef','Codeforces','Course'];
 
 function fresh(){
+<<<<<<< HEAD
   return {activities: DEFAULTS.map((n,i)=>({id:'a'+(i+1), name:n})), days:{}, nextId:DEFAULTS.length+1, lastExport:null, skills:seedSkills()};
+=======
+  return {activities: DEFAULTS.map((n,i)=>({id:'a'+(i+1), name:n})), days:{}, nextId:DEFAULTS.length+1, lastExport:null};
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
 }
 function load(){
   try{
     const s = JSON.parse(localStorage.getItem(KEY));
+<<<<<<< HEAD
     if(s && Array.isArray(s.activities) && s.days){ ensureSkills(s); return s; }
+=======
+    if(s && Array.isArray(s.activities) && s.days) return s;
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
   }catch(e){}
   return fresh();
 }
@@ -218,7 +235,11 @@ function dayList(n){
 function render(){
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
   const m=document.getElementById('main');
+<<<<<<< HEAD
   m.innerHTML = view==='today' ? vToday() : view==='review' ? vReview() : view==='skills' ? vSkills() : view==='roadmap' ? vRoadmap() : vSettings();
+=======
+  m.innerHTML = view==='today' ? vToday() : view==='review' ? vReview() : vSettings();
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
 }
 document.getElementById('nav').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return; view=b.dataset.v; render();
@@ -333,7 +354,11 @@ function vSettings(){
     <div class="row" style="margin-top:12px"><input type="text" id="newAct" placeholder="New activity, e.g. Read paper" style="flex:1" onkeydown="if(event.key==='Enter')addAct()">
     <button class="btn primary" onclick="addAct()">Add</button></div></div>
   <div class="card"><h3>Your data</h3>
+<<<<<<< HEAD
     <p class="muted" style="margin-top:0">Everything is stored on this Mac, inside this browser or app. ${total} day(s) recorded. Skills and roadmap progress are saved here too. ${state.lastExport?'Last backup: '+state.lastExport+'.':'No backup yet.'}</p>
+=======
+    <p class="muted" style="margin-top:0">Everything is stored on this Mac, inside this browser or app. ${total} day(s) recorded. ${state.lastExport?'Last backup: '+state.lastExport+'.':'No backup yet.'}</p>
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
     <div class="row" style="flex-wrap:wrap">
       <button class="btn primary" onclick="exportJSON()">Download backup (JSON)</button>
       <button class="btn" onclick="exportCSV()">Export CSV</button>
@@ -377,7 +402,11 @@ function importJSON(file){
       const s=JSON.parse(r.result);
       if(!Array.isArray(s.activities)||typeof s.days!=='object') throw 0;
       if(!confirm('Replace the data in this app with the backup?')) return;
+<<<<<<< HEAD
       state=s; if(!state.nextId) state.nextId=state.activities.length+100; ensureSkills(state); save(); render();
+=======
+      state=s; if(!state.nextId) state.nextId=state.activities.length+100; save(); render();
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
     }catch(e){ alert('That file is not a valid tracker backup.'); }
   };
   r.readAsText(file);
@@ -387,6 +416,7 @@ function resetAll(){
   state=fresh(); save(); render();
 }
 
+<<<<<<< HEAD
 /* ---------- Skills & Roadmap ---------- */
 const STATUSES = ['Not Started','In Progress','Completed'];
 let sRole = 'overview', rRole = 'ai', sf = {pri:'all', st:'all', cat:'all', q:''};
@@ -556,6 +586,8 @@ function vRoadmap(){
       <div class="tl">${stageHtml}</div></div></div>`;
 }
 
+=======
+>>>>>>> 82857e63deff89b534fdc39b7c4a8df175696b1f
 /* ---------- keyboard ---------- */
 document.addEventListener('keydown',e=>{
   if(view!=='today') return;
